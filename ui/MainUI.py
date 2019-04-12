@@ -1,7 +1,7 @@
 from PyQt5.QtWidgets import (QWidget, QSizePolicy, QVBoxLayout, QPushButton, QSplitter, QHBoxLayout, QFrame, QLabel,
-                             QTableWidget, QAbstractItemView, QAbstractScrollArea, QHeaderView)
+                             QTableWidget, QAbstractItemView, QAbstractScrollArea, QHeaderView, QFileDialog)
 from assets import styles
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QDir
 
 
 class MainUI(QWidget):
@@ -98,9 +98,6 @@ class MainUI(QWidget):
         frame.setLayout(layout)
         return frame
 
-    def select_button_clicked(self):
-        print('Folder')
-
     def _initialize_folder_table_view(self):
         self.folder_list_view = self._get_table_widget()
         self.folder_list_view.setColumnCount(4)
@@ -115,3 +112,18 @@ class MainUI(QWidget):
         table_widget.horizontalHeader().setDefaultAlignment(Qt.AlignCenter)
         table_widget.verticalScrollBar().setStyleSheet(styles.SCROLL_AREA)
         return table_widget
+
+    def select_button_clicked(self):
+        try:
+            print('Folder')
+            self.file_dialog = QFileDialog()
+            options = QFileDialog.Options()
+            self.file_dialog.setFileMode(QFileDialog.Directory)
+            options |= QFileDialog.ShowDirsOnly
+            # self.file_name = self.file_dialog.getOpenFileName(self, "Folder Lookup", options=options,
+            #                                                   filter="Directory")
+            if self.file_dialog.exec():
+                self.file_name = self.file_dialog
+            print(self.file_name)
+        except Exception as e:
+            print(e)
