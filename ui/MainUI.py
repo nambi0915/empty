@@ -1,7 +1,9 @@
 from PyQt5.QtWidgets import (QWidget, QSizePolicy, QVBoxLayout, QPushButton, QSplitter, QHBoxLayout, QFrame, QLabel,
-                             QTableWidget, QAbstractItemView, QAbstractScrollArea, QHeaderView, QFileDialog)
-from assets import styles
+                             QTableWidget, QAbstractItemView, QAbstractScrollArea, QHeaderView, QFileDialog, QListView,
+                             QTreeView, QTableWidgetItem)
 from PyQt5.QtCore import Qt, QDir
+from assets import styles
+from backie.Empty import Empty
 
 
 class MainUI(QWidget):
@@ -9,7 +11,9 @@ class MainUI(QWidget):
     def __init__(self, parent=None):
         try:
             super(MainUI, self).__init__(parent)
-            self.setMinimumSize(800, 600)
+            # self.setMinimumSize(800, 600)
+            self.selected_folders = []
+            self.empty = Empty()
             self.setSizePolicy(QSizePolicy.Ignored, QSizePolicy.Ignored)
             self._initialize_components()
             self.setWindowTitle('Delete Empty')
@@ -83,7 +87,7 @@ class MainUI(QWidget):
         frame.setMaximumHeight(50)
         layout = QHBoxLayout()
         layout.setAlignment(Qt.AlignCenter)
-        header = QLabel('Empty Directories')
+        header = QLabel('Empty Folders')
         header.setStyleSheet(styles.LABEL_HEADER)
         layout.addWidget(header)
         frame.setLayout(layout)
@@ -111,19 +115,45 @@ class MainUI(QWidget):
         table_widget.verticalHeader().setVisible(False)
         table_widget.horizontalHeader().setDefaultAlignment(Qt.AlignCenter)
         table_widget.verticalScrollBar().setStyleSheet(styles.SCROLL_AREA)
+        table_widget.horizontalHeader().setHighlightSections(False)
         return table_widget
 
     def select_button_clicked(self):
         try:
             print('Folder')
-            self.file_dialog = QFileDialog()
-            options = QFileDialog.Options()
-            self.file_dialog.setFileMode(QFileDialog.Directory)
-            options |= QFileDialog.ShowDirsOnly
-            # self.file_name = self.file_dialog.getOpenFileName(self, "Folder Lookup", options=options,
-            #                                                   filter="Directory")
-            if self.file_dialog.exec():
-                self.file_name = self.file_dialog
-            print(self.file_name)
+            self._get_file_dialog()
+            if self.selected_folders:
+                print(self.selected_folders)
+                self.empty_folders_list = self.empty.get_empty_folders_list(self.selected_folders)
+                print(self.empty_folders_list)
+
+            self.generate_folder_list_view()
+
         except Exception as e:
             print(e)
+
+    def generate_folder_list_view(self):
+        self.folder_list_view.setRowCount(len(self.empty_folders_list))
+        index = 0
+        for folder in self.empty_folders_list:
+            self.folder_list_view.setItem(index, 0, QTableWidgetItem(folder[0]))
+            self.folder_list_view.setItem(index, 1, QTableWidgetItem(folder[1]))
+            self.folder_list_view.setItem(index, 2, QTableWidgetItem(folder[2]))
+            self.folder_list_view.setItem(index, 3, QTableWidgetItem(folder[3]))
+            index += 1
+
+    def _get_file_dialog(self):
+        self.file_dialog = QFileDialog()
+        options = QFileDialog.Options()
+        options |= QFileDialog.ShowDirsOnly
+        options |= QFileDialog.DontUseNativeDialog
+        self.file_dialog.setFileMode(QFileDialog.DirectoryOnly)
+        self.file_dialog.setOptions(options)
+        self.file_dialog.setWindowTitle("Select Folder")
+        self.file_dialog.setDirectory(QDir.home())
+        self.file_dialog.setWindowFlag(Qt.WindowContextHelpButtonHint, False)
+        self.file_dialog.findChildren(QListView)[0].setSelectionMode(QAbstractItemView.ExtendedSelection)
+        self.file_dialog.findChildren(QTreeView)[0].setSelectionMode(QAbstractItemView.ExtendedSelection)
+        # self.file_dialog.setFixedSize(800, 600)
+        if self.file_dialog.exec():
+            self.selected_folders = self.file_dialog.selectedFiles()
