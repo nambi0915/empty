@@ -3,6 +3,7 @@ from PyQt5.QtWidgets import (QWidget, QSizePolicy, QVBoxLayout, QPushButton, QSp
                              QTreeView, QTableWidgetItem)
 from PyQt5.QtCore import Qt, QDir
 from assets import styles
+from ui.Widgets import Widgets
 from backie.Empty import Empty
 
 
@@ -14,6 +15,7 @@ class MainUI(QWidget):
             # self.setMinimumSize(800, 600)
             self.selected_folders = []
             self.empty = Empty()
+            self.widgets = Widgets()
             self.setSizePolicy(QSizePolicy.Ignored, QSizePolicy.Ignored)
             self._initialize_components()
             self.setWindowTitle('Delete Empty')
@@ -107,6 +109,7 @@ class MainUI(QWidget):
         self.folder_list_view.setColumnCount(4)
         self.folder_list_view.setHorizontalHeaderLabels(['Folder Name', 'Path', 'Created time', 'Deleted time'])
         self.folder_list_view.setSelectionBehavior(QAbstractItemView.SelectRows)
+        # self.folder_list_view.horizontalHeader().setSectionResizeMode(1, QHeaderView.ResizeToContents)
         self.folder_list_view.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
 
     def _get_table_widget(self):
@@ -116,6 +119,9 @@ class MainUI(QWidget):
         table_widget.horizontalHeader().setDefaultAlignment(Qt.AlignCenter)
         table_widget.verticalScrollBar().setStyleSheet(styles.SCROLL_AREA)
         table_widget.horizontalHeader().setHighlightSections(False)
+        table_widget.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        table_widget.horizontalHeader().setStretchLastSection(True)
+
         return table_widget
 
     def select_button_clicked(self):
@@ -124,23 +130,31 @@ class MainUI(QWidget):
             self._get_file_dialog()
             if self.selected_folders:
                 print(self.selected_folders)
-                self.empty_folders_list = self.empty.get_empty_folders_list(self.selected_folders)
-                print(self.empty_folders_list)
+                self.folder_table_contents = self.empty.get_empty_folders_list(self.selected_folders)
+                print(self.folder_table_contents)
+            if self.folder_table_contents:
+                self.generate_folder_list_view()
+            else:
+                message_box = self.widgets.get_message_box("No Empty folders")
+                message_box.exec()
 
-            self.generate_folder_list_view()
 
         except Exception as e:
             print(e)
 
     def generate_folder_list_view(self):
-        self.folder_list_view.setRowCount(len(self.empty_folders_list))
+        self.folder_list_view.setRowCount(len(self.folder_table_contents))
         index = 0
-        for folder in self.empty_folders_list:
+        for folder in self.folder_table_contents:
             self.folder_list_view.setItem(index, 0, QTableWidgetItem(folder[0]))
             self.folder_list_view.setItem(index, 1, QTableWidgetItem(folder[1]))
             self.folder_list_view.setItem(index, 2, QTableWidgetItem(folder[2]))
             self.folder_list_view.setItem(index, 3, QTableWidgetItem(folder[3]))
             index += 1
+        self.folder_list_view.horizontalHeader().setSectionResizeMode(0, QHeaderView.Interactive)
+        self.folder_list_view.horizontalHeader().setSectionResizeMode(1, QHeaderView.Interactive)
+        self.folder_list_view.horizontalHeader().setSectionResizeMode(2, QHeaderView.Interactive)
+        self.folder_list_view.horizontalHeader().setSectionResizeMode(3, QHeaderView.Interactive)
 
     def _get_file_dialog(self):
         self.file_dialog = QFileDialog()

@@ -61,14 +61,14 @@ QTableWidget::item
 
 QHeaderView
 {
-    font-family: SourceSansPro-Bold;
-    gridline-color: #FFFFFF;
+    font-family: SourceSansPro-bold;
+    gridline-color: black;
     vertical-alignment
 }
 
 QHeaderView::section 
 {
-    font-size: 16px;
+    font-size: 19px;
     border: none;
     margin-bottom:0px;
     background-color: white;    
@@ -76,25 +76,25 @@ QHeaderView::section
 
 QTableWidget::item:pressed
 {
-    background: #33A4DF;
+    background: Darkslategrey;
     color: #FFFFFF;
 }
 
 QTableWidget::item:selected:active
 {
-    background: #33A4DF;
+    background: Darkslategrey;
     color: #FFFFFF;
 }
 
 QTableWidget::item:selected:hover
 {
-    background-color: #009CDE;
+    background-color: Darkslategrey;
     color: #FFFFFF;
 }
 
 QTableWidget::item:hover
 {
-    background-color:#009CDE; 
+    background-color:Darkslategrey; 
     color:#FFFFFF;
 }
 """
