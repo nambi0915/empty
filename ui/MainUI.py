@@ -42,8 +42,8 @@ class MainUI(QWidget):
         frame = self.new_qframe()
         frame.setMaximumWidth(200)
         splitter = QSplitter(Qt.Vertical)
-        right_top_frame = self._initialize_right_top_frame()
-        right_bottom_frame = self._initialize_right_bottom_frame()
+        right_top_frame = self._initialize_left_top_frame()
+        right_bottom_frame = self._initialize_left_bottom_frame()
         splitter.addWidget(right_top_frame)
         splitter.addWidget(right_bottom_frame)
         layout = QVBoxLayout()
@@ -56,15 +56,15 @@ class MainUI(QWidget):
         frame = self.new_qframe()
         layout = QVBoxLayout()
         splitter = QSplitter(Qt.Vertical)
-        left_top_frame = self._initialize_left_top_frame()
-        left_bottom_frame = self._initialize_left_bottom_frame()
+        left_top_frame = self._initialize_right_top_frame()
+        left_bottom_frame = self._initialize_right_bottom_frame()
         splitter.addWidget(left_top_frame)
         splitter.addWidget(left_bottom_frame)
         layout.addWidget(splitter)
         frame.setLayout(layout)
         return frame
 
-    def _initialize_right_top_frame(self):
+    def _initialize_left_top_frame(self):
         frame = self.new_qframe()
         frame.setMaximumHeight(50)
         layout = QHBoxLayout()
@@ -78,13 +78,24 @@ class MainUI(QWidget):
         frame.setLayout(layout)
         return frame
 
-    def _initialize_right_bottom_frame(self):
+    def _initialize_left_bottom_frame(self):
         frame = self.new_qframe()
-        layout = QHBoxLayout()
+        layout = QVBoxLayout()
+        layout.setAlignment(Qt.AlignTop)
+        self.delete_all_button = QPushButton('Delete All')
+        self.delete_selected_button = QPushButton('Delete Selected')
+        self.delete_selected_button.setEnabled(False)
+        self.delete_all_button.setEnabled(False)
+        self.delete_all_button.setStyleSheet(styles.DIALOG_BUTTON)
+        self.delete_selected_button.setStyleSheet(styles.DIALOG_BUTTON)
+
+        layout.addWidget(self.delete_selected_button)
+        layout.addWidget(self.delete_all_button)
+
         frame.setLayout(layout)
         return frame
 
-    def _initialize_left_top_frame(self):
+    def _initialize_right_top_frame(self):
         frame = self.new_qframe()
         frame.setMaximumHeight(50)
         layout = QHBoxLayout()
@@ -95,7 +106,7 @@ class MainUI(QWidget):
         frame.setLayout(layout)
         return frame
 
-    def _initialize_left_bottom_frame(self):
+    def _initialize_right_bottom_frame(self):
         frame = self.new_qframe()
         layout = QHBoxLayout()
         self._initialize_folder_table_view()
@@ -124,6 +135,12 @@ class MainUI(QWidget):
 
         return table_widget
 
+    def delete_all_button_clicked(self):
+        pass
+
+    def delete_selected_button_clicked(self):
+        pass
+
     def select_button_clicked(self):
         try:
             print('Folder')
@@ -133,6 +150,8 @@ class MainUI(QWidget):
                 self.folder_table_contents = self.empty.get_empty_folders_list(self.selected_folders)
                 print(self.folder_table_contents)
             if self.folder_table_contents:
+                self.delete_selected_button.setEnabled(True)
+                self.delete_all_button.setEnabled(True)
                 self.generate_folder_list_view()
             else:
                 message_box = self.widgets.get_message_box("No Empty folders")

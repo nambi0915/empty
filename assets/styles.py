@@ -11,7 +11,7 @@ DIALOG_BUTTON = """
 QPushButton:enabled {
     font-family: SourceSansPro-Semibold;
     color: #FFFFFF;
-    background-color: orange; 
+    background-color: #43B54A; 
     border: none;
     border-radius: 1px;
     text-align: center;
