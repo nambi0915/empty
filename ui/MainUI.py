@@ -8,12 +8,17 @@ from backie.Empty import Empty
 
 
 class MainUI(QWidget):
+    """
+    Components of Main UI displayed when app opens up
+    """
 
     def __init__(self, parent=None):
         try:
             super(MainUI, self).__init__(parent)
             # self.setMinimumSize(800, 600)
             self.selected_folders = []
+            self.folder_table_contents = []
+            self.empty_folders = []
             self.empty = Empty()
             self.widgets = Widgets()
             self.setSizePolicy(QSizePolicy.Ignored, QSizePolicy.Ignored)
@@ -42,10 +47,10 @@ class MainUI(QWidget):
         frame = self.new_qframe()
         frame.setMaximumWidth(200)
         splitter = QSplitter(Qt.Vertical)
-        right_top_frame = self._initialize_left_top_frame()
-        right_bottom_frame = self._initialize_left_bottom_frame()
-        splitter.addWidget(right_top_frame)
-        splitter.addWidget(right_bottom_frame)
+        left_top_frame = self._initialize_left_top_frame()
+        left_bottom_frame = self._initialize_left_bottom_frame()
+        splitter.addWidget(left_top_frame)
+        splitter.addWidget(left_bottom_frame)
         layout = QVBoxLayout()
 
         layout.addWidget(splitter)
@@ -56,10 +61,13 @@ class MainUI(QWidget):
         frame = self.new_qframe()
         layout = QVBoxLayout()
         splitter = QSplitter(Qt.Vertical)
-        left_top_frame = self._initialize_right_top_frame()
-        left_bottom_frame = self._initialize_right_bottom_frame()
-        splitter.addWidget(left_top_frame)
-        splitter.addWidget(left_bottom_frame)
+        right_top_frame = self._initialize_right_top_frame()
+        right_middle_frame = self._initialize_right_middle_frame()
+        right_bottom_frame = self._initialize_right_bottom_frame()
+
+        splitter.addWidget(right_top_frame)
+        splitter.addWidget(right_middle_frame)
+        splitter.addWidget(right_bottom_frame)
         layout.addWidget(splitter)
         frame.setLayout(layout)
         return frame
@@ -81,16 +89,6 @@ class MainUI(QWidget):
     def _initialize_left_bottom_frame(self):
         frame = self.new_qframe()
         layout = QVBoxLayout()
-        layout.setAlignment(Qt.AlignTop)
-        self.delete_all_button = QPushButton('Delete All')
-        self.delete_selected_button = QPushButton('Delete Selected')
-        self.delete_selected_button.setEnabled(False)
-        self.delete_all_button.setEnabled(False)
-        self.delete_all_button.setStyleSheet(styles.DIALOG_BUTTON)
-        self.delete_selected_button.setStyleSheet(styles.DIALOG_BUTTON)
-
-        layout.addWidget(self.delete_selected_button)
-        layout.addWidget(self.delete_all_button)
 
         frame.setLayout(layout)
         return frame
@@ -106,13 +104,35 @@ class MainUI(QWidget):
         frame.setLayout(layout)
         return frame
 
-    def _initialize_right_bottom_frame(self):
+    def _initialize_right_middle_frame(self):
         frame = self.new_qframe()
         layout = QHBoxLayout()
         self._initialize_folder_table_view()
 
         layout.addWidget(self.folder_list_view)
         frame.setLayout(layout)
+        return frame
+
+    def _initialize_right_bottom_frame(self):
+        frame = self.new_qframe()
+        layout = QHBoxLayout()
+        layout.setAlignment(Qt.AlignTop)
+        layout.setSpacing(50)
+        self.delete_all_button = QPushButton('Delete All')
+        self.delete_selected_button = QPushButton('Delete Selected')
+        self.delete_all_button.setMaximumWidth(160)
+        self.delete_selected_button.setMaximumWidth(160)
+        self.delete_selected_button.setEnabled(False)
+        self.delete_all_button.setEnabled(False)
+        self.delete_all_button.setStyleSheet(styles.DIALOG_BUTTON)
+        self.delete_selected_button.setStyleSheet(styles.DIALOG_BUTTON)
+        self.delete_all_button.clicked.connect(self.delete_all_button_clicked)
+
+        layout.addWidget(self.delete_all_button)
+        layout.addWidget(self.delete_selected_button)
+
+        frame.setLayout(layout)
+
         return frame
 
     def _initialize_folder_table_view(self):
@@ -122,6 +142,27 @@ class MainUI(QWidget):
         self.folder_list_view.setSelectionBehavior(QAbstractItemView.SelectRows)
         # self.folder_list_view.horizontalHeader().setSectionResizeMode(1, QHeaderView.ResizeToContents)
         self.folder_list_view.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        self.folder_list_view.itemSelectionChanged.connect(self.delete_select_button_toggle)
+
+    def delete_select_button_toggle(self):
+        self.selected_empty_folders = self.folder_list_view.selectedIndexes()
+        if self.selected_empty_folders:
+            self.delete_selected_button.setEnabled(True)
+            print(dir(self.selected_empty_folders[0]))
+            print(self.selected_empty_folders[0].row)
+            print(self.selected_empty_folders[0].column)
+            print(self.selected_empty_folders[0].child)
+            print(self.selected_empty_folders[0].flags)
+            print(self.selected_empty_folders[0].data)
+            print(self.selected_empty_folders[0].internalId)
+            print(self.selected_empty_folders[0].internalPointer)
+            print(self.selected_empty_folders[0].model)
+            print(self.selected_empty_folders[0].parent)
+            print(self.selected_empty_folders[0].sibling)
+
+        else:
+            self.delete_selected_button.setEnabled(False)
+        print(self.selected_empty_folders)
 
     def _get_table_widget(self):
         table_widget = QTableWidget()
@@ -136,7 +177,9 @@ class MainUI(QWidget):
         return table_widget
 
     def delete_all_button_clicked(self):
-        pass
+        print(self.folder_table_contents)
+        if self.empty.delete_folders(self.empty_folders):
+            self.widgets.get_message_box("Deleted Successfully").exec()
 
     def delete_selected_button_clicked(self):
         pass
@@ -147,17 +190,15 @@ class MainUI(QWidget):
             self._get_file_dialog()
             if self.selected_folders:
                 print(self.selected_folders)
-                self.folder_table_contents = self.empty.get_empty_folders_list(self.selected_folders)
+                self.folder_table_contents, self.empty_folders = self.empty.get_empty_folders_list(
+                    self.selected_folders)
                 print(self.folder_table_contents)
             if self.folder_table_contents:
-                self.delete_selected_button.setEnabled(True)
                 self.delete_all_button.setEnabled(True)
                 self.generate_folder_list_view()
             else:
                 message_box = self.widgets.get_message_box("No Empty folders")
                 message_box.exec()
-
-
         except Exception as e:
             print(e)
 

@@ -1,4 +1,5 @@
 import os
+import shutil
 from datetime import datetime
 
 
@@ -21,11 +22,11 @@ class Empty:
                 #         sub_folder.remove(root)
             # print(sub_folder)
 
-        empty_list = self.make_list()
-        return empty_list
+        empty_folder_details = self.make_list()
+        return empty_folder_details, self.empty_folders
 
     def make_list(self):
-        empty = []
+        empty_folder_details = []
         for folder in self.empty_folders:
             created_time = datetime.fromtimestamp(os.path.getctime(folder)).strftime('%Y-%m-%d %H:%M:%S')
             folder_details = list()
@@ -33,9 +34,17 @@ class Empty:
             folder_details.append(folder.replace(self.root_folder, ''))
             folder_details.append(str(created_time))
             folder_details.append('-')
-            empty.append(folder_details)
+            empty_folder_details.append(folder_details)
 
-        return empty
+        return empty_folder_details
 
     def listdir_fullpath(self, folder):
         return [os.path.join(folder, file).replace('\\', '/') for file in os.listdir(folder)]
+
+    def delete_folders(self, folder_list):
+        try:
+            for folder in folder_list:
+                shutil.rmtree(folder)
+            return True
+        except Exception as e:
+            print(e)
