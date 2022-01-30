@@ -1,9 +1,11 @@
 import sys
-from PyQt5.QtWidgets import QApplication, QSystemTrayIcon, QMainWindow
+
 from PyQt5.QtCore import Qt, QSize
 from PyQt5.QtGui import QIcon
-from ui.MainUI import MainUI
+from PyQt5.QtWidgets import QApplication
+
 from assets import properties
+from ui.MainUI import MainUI
 
 if __name__ == '__main__':
     try:

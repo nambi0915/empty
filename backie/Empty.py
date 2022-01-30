@@ -28,7 +28,8 @@ class Empty:
     def make_list(self):
         empty_folder_details = []
         for folder in self.empty_folders:
-            created_time = datetime.fromtimestamp(os.path.getctime(folder)).strftime('%Y-%m-%d %H:%M:%S')
+            created_time = datetime.fromtimestamp(os.path.getctime(folder)).strftime(
+                '%Y-%m-%d %H:%M:%S')
             folder_details = list()
             folder_details.append(folder.split("\\")[-1])
             folder_details.append(folder.replace(self.root_folder, ''))

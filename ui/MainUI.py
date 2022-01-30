@@ -1,5 +1,7 @@
-from PyQt5.QtWidgets import (QWidget, QSizePolicy, QVBoxLayout, QPushButton, QSplitter, QHBoxLayout, QFrame, QLabel,
-                             QTableWidget, QAbstractItemView, QAbstractScrollArea, QHeaderView, QFileDialog, QListView,
+from PyQt5.QtWidgets import (QWidget, QSizePolicy, QVBoxLayout, QPushButton, QSplitter, QHBoxLayout,
+                             QFrame, QLabel,
+                             QTableWidget, QAbstractItemView, QAbstractScrollArea, QHeaderView,
+                             QFileDialog, QListView,
                              QTreeView, QTableWidgetItem)
 from PyQt5.QtCore import Qt, QDir
 from assets import styles
@@ -138,7 +140,8 @@ class MainUI(QWidget):
     def _initialize_folder_table_view(self):
         self.folder_list_view = self._get_table_widget()
         self.folder_list_view.setColumnCount(4)
-        self.folder_list_view.setHorizontalHeaderLabels(['Folder Name', 'Path', 'Created time', 'Deleted time'])
+        self.folder_list_view.setHorizontalHeaderLabels(
+            ['Folder Name', 'Path', 'Created time', 'Deleted time'])
         self.folder_list_view.setSelectionBehavior(QAbstractItemView.SelectRows)
         # self.folder_list_view.horizontalHeader().setSectionResizeMode(1, QHeaderView.ResizeToContents)
         self.folder_list_view.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
@@ -226,8 +229,10 @@ class MainUI(QWidget):
         self.file_dialog.setWindowTitle("Select Folder")
         self.file_dialog.setDirectory(QDir.home())
         self.file_dialog.setWindowFlag(Qt.WindowContextHelpButtonHint, False)
-        self.file_dialog.findChildren(QListView)[0].setSelectionMode(QAbstractItemView.ExtendedSelection)
-        self.file_dialog.findChildren(QTreeView)[0].setSelectionMode(QAbstractItemView.ExtendedSelection)
+        self.file_dialog.findChildren(QListView)[0].setSelectionMode(
+            QAbstractItemView.ExtendedSelection)
+        self.file_dialog.findChildren(QTreeView)[0].setSelectionMode(
+            QAbstractItemView.ExtendedSelection)
         # self.file_dialog.setFixedSize(800, 600)
         if self.file_dialog.exec():
             self.selected_folders = self.file_dialog.selectedFiles()
